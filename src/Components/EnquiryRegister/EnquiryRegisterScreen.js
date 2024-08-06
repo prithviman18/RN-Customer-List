@@ -18,22 +18,16 @@ import OverlayLoader from '../../Components/Loader/OverLayLoader';
 import useDebouncedSearch from '../../Hooks/useDebouncedSearch';
 import { MaterialIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { View, Image  , Text} from 'react-native';
+import { View, Image  , Text, ActivityIndicator} from 'react-native';
 
-// Debugging logs
-console.log('useDebouncedSearch:', useDebouncedSearch);
-console.log('EmptyItem:', EmptyItem);
-console.log('EnquiryRegisterList:', EnquiryRegisterList);
-console.log('EmptyState:', EmptyState);
-console.log('NavigationHeader:', NavigationHeader);
-console.log('SearchContainer:', SearchContainer);
-console.log('RoundedContainer:', RoundedContainer);
-console.log('OverlayLoader:', OverlayLoader);
+
 
 const EnquiryRegisterScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
     const { data, loading, fetchData, fetchMoreData } = useDataFetching(fetchCustomers);
     const { searchText, handleSearchTextChange } = useDebouncedSearch((text) => fetchData({searchText: text}), 500);
+    console.log("API RESPONSE IS ",data);
+    
 
     useFocusEffect(
         useCallback(() => {
@@ -80,9 +74,14 @@ const EnquiryRegisterScreen = ({ navigation }) => {
             onEndReached={handleLoadMore}
             showsVerticalScrollIndicator={false}
             onEndReachedThreshold={0.2}
+            ListFooterComponent={
+                loading && <ActivityIndicator size="large" color={COLORS.orange} />
+            }
             estimatedItemSize={100}
+            style={{ flex: 1 }} // Ensure FlashList has a flex property
         />
     );
+    
 
     const renderCustomers = () => {
         if (data.length === 0 && !loading) {
@@ -92,20 +91,21 @@ const EnquiryRegisterScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView>
-            <NavigationHeader title="Enquiry Register" onBackPress={() => navigation.goBack()} />
-            <SearchContainer placeholder="Search Customers" onChangeText={handleSearchTextChange} />
-            <RoundedContainer>
-                {renderCustomers()}
-                <FAB
-                    style={styles.fab}
-                    icon={() => <MaterialIcons name="add" size={24} color="white" />}
-                    onPress={() => console.log("fab button pressed")}
-                    animated={true}
-                />
-            </RoundedContainer>
-            <OverlayLoader visible={loading} />
-        </SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
+    <NavigationHeader title="Enquiry Register" onBackPress={() => navigation.goBack()} />
+    <SearchContainer placeholder="Search Customers" onChangeText={handleSearchTextChange} />
+    <RoundedContainer style={{ flex: 1 }}>
+        {renderCustomers()}
+        <FAB
+            style={styles.fab}
+            icon={() => <MaterialIcons name="add" size={24} color="white" />}
+            onPress={() => console.log("fab button pressed")}
+            animated={true}
+        />
+    </RoundedContainer>
+    <OverlayLoader visible={loading} />
+</SafeAreaView>
+
     );
 };
 
